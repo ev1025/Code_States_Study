@@ -1,0 +1,99 @@
+# 파이썬공부 2일차(2022.08.03)
+
+: 식재료를 준비하는 과정 , 분석 전 통계치와 시각화를 통해 데이터를 이해     
+
+데이터를 처리하기 전에 데이터를 정제하여 직관적으로 확인 가능하도록 바꿔놓는 것
+
+
+
+데이터 업로드
+
+from google.colab import files
+
+uploaded = files.upload()
+
+     
+
+데이터 불러오기
+
+df = pd.read_csv('파일명.csv', sep=';') - 파일명.csv를 ;구분선으로 불러옴
+
+df = pd.read_excel(‘url’, ‘sheet_name’ ) - url에 있는 엑셀파일의 시트를 불러옴
+
+
+
+Searbon 라이브러리에 내장되어 있는 Titanic 데이터셋을 불러오기     
+
+import seaborn as sns
+
+df = sns.load_dataset("titanic")
+
+
+
+.groupby(‘인자’) - 데이터를 그룹으로 묶음
+
+.groupby(‘인자1’)[‘인자2’] - 인자가 1(x)인 인자의 2(y)값
+
+.groupby([‘인자1’,‘인자2’]) - 두 개의 인자에 포함되는 값  (1 and2가 x축)   
+
+.groupby(‘인자’, as_index=false) - 데이터프레임형태로 보여줌 
+
+as_index=false 안쓰면 series(수치형)으로 보여줌
+
+.reset_index() - 데이터프레임형태로 보여줌     
+
+
+
+.value_counts() - 값의 갯수, columns(이름), dtype    
+
+ 
+
+[‘인자’] - 인자값을 보여줌       
+
+ 
+
+파일.인자.describe() - 파일의 인자값의 개수,평균,표준편차 등 나타냄(통계치를 보여줌)
+
+                     숫자로 이루어진 COLUMNS만 사용가능
+
+                     (.info()와 비교)
+
+          
+
+.plot(kind=’bar’); - bar형태로 시각화
+
+plt.scatter(파일[‘인자1’],파일[‘인자2’]); - scatter형태로 인자1(행)과 인자2(열) 시각화
+
+plt.plot(인자); - plot형태로 표현 
+
+
+
+row값만 불러오기
+
+cancer data에서 malignant rows만 선택합니다.
+
+malignant_cancer = df[df['diagnosis'] == 'Malignant']
+
+malignant_cancer = df.query('diagnosis == "Malignant"')     
+
+
+
+쿼리
+
+query((“<=”,“ == ”,“ >=”, “(인자>)and(<인자)”) - 구간설정이 가능함
+
+변수 = df.query(“인자>20”)  - 범위별 변수 지정가능
+
+변수.인자.value_counts() - 변수의 인자에 포함된 값 불러오기 
+
+(normalize=true) 입력하면 백분위로 보임 (0.553253535)이런식으로 
+
+.plot.pie()를 뒤에 쓰면 이 백분율로 파이차트를 생성
+
+.plt.show  <-- 플롯 한 뒤에 써줘야함 (안쓰면오류뜸)   
+
+
+
+dtype = ‘<U3’ - 유니코드 3개 단어(ex :RED)
+
+dtype = ‘<U5’ - 유니코드 5개 단어(ex :WHITE)

@@ -134,20 +134,69 @@ pcm = plot_confusion_matrix(logistic, X_test_ohe, y_test, # 모델, 특성, 타�
 plt.title(f'Confusion matrix of Logistic Regression, n = {len(y_val)}', fontsize=15)
 plt.show();
 ```
-### 7. Roc, Auc
+### 7. ROC, AUC (Receiver Operating Characteristic, Area Under the Curve)
+#### ROC
+- 모델이 예측하는 확률과 예측값 자체를 평가하는 지표\
+- ROC Curve는 여러 임계값에 대해 TPR(True Positive Rate, recall)과 FPR(False Positive Rate)을 그래프로 보여줌   
+
+**참양성 = Recall(재현율) = Sensitivity(민감도)** = ${\displaystyle \mathrm {TPR} ={\frac {\mathrm {TP} }{\mathrm {P} }}={\frac {\mathrm {TP} }{\mathrm {TP} +\mathrm {FN} }}=1-\mathrm {FNR} }$   
+**거짓양성 = Fall-out(위양성률)** = ${\displaystyle \mathrm {FPR} ={\frac {\mathrm {FP} }{\mathrm {N} }}={\frac {\mathrm {FP} }{\mathrm {FP} +\mathrm {TN} }}=1-\mathrm {TNR(Specificity)} }$
+
+- 재현율을 높이려면 임계값을 낮춰야함 (위양성이 많아지고 precision이 낮아짐)
+    - 임계값이 1인 경우 TPR, FPR = 0
+    - 임계값이 0인 경우 TPR, FPR = 1   
+[ROC커브 그래프](http://www.navan.name/roc/)    
+
+- 임계값에 따른 FPR, TPR 구하는 코드
+```python
+from sklearn.metrics import roc_curve                 # 각 임계값에 따른 fpr과 tpr
+fpr, tpr, thresholds = roc_curve(y_val, y_pred_proba) # roc_curve(타겟값, prob of 1)
+
+roc = pd.DataFrame({
+    'FPR(Fall-out)': fpr, 
+    'TPR(Recall)': tpr, 
+    'Threshold': thresholds
+})
+roc
+```
+roc_curve 그래프(최적의 임계값)
+   - TPR 최대, FPR 최소가 되는 지점이 최적의 임계값
+   - TPR - FPR이 최대가 되는 지점
+```python
+# threshold 최대값의 인덱스, np.argmax()
+optimal_idx = np.argmax(tpr - fpr)
+optimal_threshold = thresholds[optimal_idx]
+
+print('idx:', optimal_idx, ', threshold:', optimal_threshold)
+
+optimal_fpr = roc[roc['Threshold'] == optimal_threshold]['FPR(Fall-out)']
+optimal_tpr = roc[roc['Threshold'] == optimal_threshold]['TPR(Recall)']
+
+plt.plot(fpr, tpr, label='Logistic Regression')
+
+plt.scatter(optimal_fpr, optimal_tpr, color = 'red', alpha=1, label='Optimal Threshold')
+plt.title('ROC curve')
+plt.xlabel('FPR(Fall-out)')
+plt.ylabel('TPR(Recall)')
+plt.legend();
+```
+#### AUC(Area Under the Curve)
+- ROC곡선의 아래 면적을 이용하여 분류모델의 성능을 나타내는 지표
+- 1에 가까울 수록 좋고, 0.5에 가까울수록 안좋은 모델
 ```python
 from sklearn.metrics import roc_auc_score
 
 y_pred_proba = logist.predict_proba(X_test_ohe)[:,1] # 여러 행렬이 나옴??
-auc = roc_auc_score(y_test, y_pred_proba)
+auc = roc_auc_score(y_test, y_pred_proba)            # AUC 분류모델의 성능 결과치
 ```
 
 
 
-### ETC
+### 8. ETC
 #### 임계값(thresholds)
 - Recall과 Precision은 Trade-Off 관계
 - 임계값을 낮추면 Recall이 증가 ( FN감소, FP 증가) 위양성증가
 - 임계값을 높이면 Precision이 증가 (FN증가, FP 감소) 위음성증가
-cs
-릿지랑 랏쏘의 알파랑 같은 개념이라 생각하시면되어요. 규제의 강도를 설정하는 파라미터입니당
+
+#### LogisticCV(찾아봐야됨)
+- cs :릿지랑 랏쏘의 알파랑 같은 개념, 규제의 강도를 설정하는 파라미터

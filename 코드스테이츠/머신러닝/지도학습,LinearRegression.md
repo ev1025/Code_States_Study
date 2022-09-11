@@ -91,6 +91,7 @@ multi = multi_ols.predict(X_m)             # 훈련된 모델로 X_m특성을 �
 
 
 ### 회귀평가지표
+- y_pred는 ols의 predict 값을 사용!
 * `MSE (Mean Squared Error)` = $\frac{1}{n}\sum_{i=1}^{n}(y_{i} - \hat{y_{i}})^{2}$
     - MSE는 제곱오차의 평균입니다.
     - MSE는 미분이 가능하여 비용 함수로 가장 흔하게 사용됩니다.
@@ -130,9 +131,9 @@ def eval_models(y_pred, y_real=y_real) :         # 회귀평가지표 함수
 ```
 
 ### 선형회귀모델의 계수(Coefficients)
+- 모델의 성능을 파악하는 것 fit된 모델에  .coef_ 회귀계수 , .intercept_ y절편
 - 선형회귀모델의 장점은 직관적 해석이 가능하다는 점
 - 독립변수와 종속변수 사이에 어떤 규칙을 학습했는지 알아볼 수 있다.
-- .coef_ 회귀계수 , .intercept_ y절편
 -  회귀계수 나오면 y = a1 * 회기계수1 + a2*회귀계수2 + y절편 으로 표현가능(a1 >a2라고 a1이 영향력이 큰건 아님(단순히 스케일의 차이일 수 있음)
 ```python
 model.coef_         # 모델의 회귀계수 (다중이면 feature 순서대로 나옴)

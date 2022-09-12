@@ -37,9 +37,8 @@ y_pred_base = [base_major] * len(y_train) # 기준모델의 예측값
 #### Scaling & Encoding
 - Scaling
 ```python
-from sklearn.preprocessing import StandardScaler            # 정규화
-numeric_feats = X_train.dtypes[X_train.dtypes !="object".index # 숫자형 데이터 인덱스 출력
-# numeric_feats = X_train[['age', 'height', 'weight', 'ap_hi', 'ap_lo']].columns # 데이터 타입이 제대로 안되어 있을 경우, 직접 수치 feats를 골라줘야함
+from sklearn.preprocessing import StandardScaler               # 정규화
+numeric_feats = X_train.dtypes[X_train.dtypes !="object".index # 숫자형 데이터 인덱스 출력(category데이터 분류 안되어 있으면 수기로 분류)
 
 scaler = StandardScaler()  # 각 train, val, test 데이터에 numeric_feats 인덱스값 넣어서 훈련, 예측값 생성
 X_train[numeric_feats] = scaler.fit_transform(X_train[numeric_feats])
@@ -54,9 +53,10 @@ from category_encoders import OneHotEncoder # 범주형데이터를 각 컬럼�
 ohe = OneHotEncoder(use_cat_names = True, cols =['columns'])
 # 데이터의 범주형 데이터를 수치형데이터로 변경해줌
 # 데이터가 범주형이 아닐 때, cols로 지정하면 해당 컬럼을 변경
-# use_cat_name =True 는 범주값이 열이름에 포함됨(false =인덱스포함, 디폴트)
+# use_cat_name =True 범주값이 열이름에 포함됨(false = 인덱스포함, 디폴트)
 
-X_train_ohe = ohe.fit_transform(X_train) # ohe 데이터 생성 (범주형-수치형)
+model_ohe = ohe.fit_(X_train)       # ohe 모델 생성 (범주형->수치형)
+X_train_ohe = ohe.transform(X_train) 
 X_val_ohe = ohe.transform(X_val)        
 X_test_ohe = ohe.transform(X_test)      
 ```
@@ -117,12 +117,12 @@ weighted avg       0.73      0.73      0.73     11200
 - F1점수(F1 score)는 정밀도와 재현율의 조화평균(harmonic mean)입니다:  $ 2\cdot\large\frac{precision\cdot recall}{precision + recall}$
 ---
 ![캡처](https://user-images.githubusercontent.com/110000734/188880405-bd7a5669-83f1-4b28-bd92-00068dc32167.JPG)
-- 행렬
+- confusion_matrix(행렬)
 ```python
-from sklearn.metrics import confusion_matrix # 행렬 생성
-confusion_matrix(y_test, y_test_pred)[1][1]      # (00 = TN, 01 =  FP), (10= FN, 11=TP)
+from sklearn.metrics import confusion_matrix   # 행렬 생성
+confusion_matrix(y_test, y_test_pred)          # ([0][0] = TN, [0][1] =  FP), ([1][0]= FN, [1][1]=TP)
 ```
-- Plot Counfusion Matrix
+- Plot Counfusion Matrix(그래프)
 ```python
 from sklearn.metrics import plot_confusion_matrix
 import matplotlib.pyplot as plt
@@ -148,56 +148,66 @@ plt.show();
     - 임계값이 0인 경우 TPR, FPR = 1   
 [ROC커브 그래프](http://www.navan.name/roc/)    
 
-- 임계값에 따른 FPR, TPR 구하는 코드
-```python
-from sklearn.metrics import roc_curve                 # 각 임계값에 따른 fpr과 tpr
-fpr, tpr, thresholds = roc_curve(y_val, y_pred_proba) # roc_curve(타겟값, prob of 1)
 
-roc = pd.DataFrame({
+
+- roc_curve 
+```python
+from sklearn.metrics import roc_curve
+# roc_curve값                                                           
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba) # fpr, tpr, thresholds 배열로 출력 언패킹
+
+idx = np.argmax(tpr-fpr)                               # tpr-fpr의 최대값 인덱스
+optimal_threshold = thresholds[idx]                    # thresholds의 최대값
+
+roc = pd.DataFrame({                                   # 그래프로 표현하기 위해 데이터프레임 생성
     'FPR(Fall-out)': fpr, 
     'TPR(Recall)': tpr, 
-    'Threshold': thresholds
-})
-roc
-```
-roc_curve 그래프(최적의 임계값)
-   - TPR 최대, FPR 최소가 되는 지점이 최적의 임계값
-   - TPR - FPR이 최대가 되는 지점
-```python
-# threshold 최대값의 인덱스, np.argmax()
-optimal_idx = np.argmax(tpr - fpr)
-optimal_threshold = thresholds[optimal_idx]
+    'Threshold': thresholds})
 
-print('idx:', optimal_idx, ', threshold:', optimal_threshold)
+print('idx:', idx, ', threshold:', optimal_threshold)  # 최적 threshold의 인덱스, 값
 
-optimal_fpr = roc[roc['Threshold'] == optimal_threshold]['FPR(Fall-out)']
-optimal_tpr = roc[roc['Threshold'] == optimal_threshold]['TPR(Recall)']
+optimal_fpr = roc['FPR(Fall-out)'][roc['Threshold'] == optimal_threshold] # 최대 threshold의 fpr값
+optimal_tpr = roc['TPR(Recall)'][roc['Threshold'] == optimal_threshold]   # 최대 threshold의 tpr값
 
-plt.plot(fpr, tpr, label='Logistic Regression')
-
-plt.scatter(optimal_fpr, optimal_tpr, color = 'red', alpha=1, label='Optimal Threshold')
+plt.plot(fpr, tpr, label='Logistic Regression')                                               # roc_curve
+sns.scatterplot(x=optimal_fpr, y=optimal_tpr, color='r', alpha=1, label='Optimal Threshold')  # 최대 threshold
 plt.title('ROC curve')
 plt.xlabel('FPR(Fall-out)')
 plt.ylabel('TPR(Recall)')
-plt.legend();
+plt.legend()
+plt.show();
 ```
+![캡처](https://user-images.githubusercontent.com/110000734/189675127-dfc7c1d8-8395-4c64-8cf4-c0be3cde8afb.JPG)
+
 #### AUC(Area Under the Curve)
 - ROC곡선의 아래 면적을 이용하여 분류모델의 성능을 나타내는 지표
 - 1에 가까울 수록 좋고, 0.5에 가까울수록 안좋은 모델
 ```python
 from sklearn.metrics import roc_auc_score
 
-y_pred_proba = logist.predict_proba(X_test_ohe)[:,1] # 여러 행렬이 나옴??
-auc = roc_auc_score(y_test, y_pred_proba)            # AUC 분류모델의 성능 결과치
+y_pred_proba = logistic.predict_proba(x_test_ohe)[:,1] # 0과 1의 값 중 1인 값
+auc = roc_auc_score(y_test, y_pred_proba)              # AUC 분류모델의 성능 결과치
+```
+- real과 proba 비교  dataframe
+```python
+pred_proba = pd.DataFrame({'y_test': y_test,               # y_val과 1일 확률 예측값 비교
+                           'pred_proba': y_pred_proba})
+pred_proba.sort_values(by='pred_proba', ascending=True)
 ```
 
+#### 8. LogisticCV
+-최적의 규제 강도(Cs)를 구하는 방법
+```python
+from sklearn.linear_model import LogisticRegressionCV
+Cs = np.arange(1,100,1)                          # 규제의 강도를 설정하는 파라미터(릿지,라쏘 알파와 같은 개념)
+logistic_cv = LogisticRegressionCV(Cs=Cs)        # Cs별 로지스틱 모델
+logistic_cv.fit(x_train_ohe, y_train)                 
 
+logistic_cv_val = logistic_cv.predict(x_val_ohe) # 검증데이터 예측값
+print(f"cs:{logistic_cv.C_[0]}, accuracy:{round(test(y_val, logistic_cv_val)[0],2)}") # 모델.C_ = 최적의 Cs값
+```
 
-### 8. ETC
 #### 임계값(thresholds)
 - Recall과 Precision은 Trade-Off 관계
 - 임계값을 낮추면 Recall이 증가 ( FN감소, FP 증가) 위양성증가
 - 임계값을 높이면 Precision이 증가 (FN증가, FP 감소) 위음성증가
-
-#### LogisticCV(찾아봐야됨)
-- cs :릿지랑 랏쏘의 알파랑 같은 개념, 규제의 강도를 설정하는 파라미터

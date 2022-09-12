@@ -122,18 +122,19 @@ weighted avg       0.73      0.73      0.73     11200
 from sklearn.metrics import confusion_matrix # 행렬 생성
 confusion_matrix(y_test, y_test_pred)[1][1]      # (00 = TN, 01 =  FP), (10= FN, 11=TP)
 ```
-- 히트맵
+- Plot Counfusion Matrix
 ```python
 from sklearn.metrics import plot_confusion_matrix
 import matplotlib.pyplot as plt
 
-fig, ax = plt.subplots()
-pcm = plot_confusion_matrix(logistic, X_test_ohe, y_test, # 모델, 특성, 타겟
-                            cmap=plt.cm.Blues,
-                            ax=ax)
-plt.title(f'Confusion matrix of Logistic Regression, n = {len(y_val)}', fontsize=15)
+plot = plot_confusion_matrix(logistic,           # 분류할 모델
+                             x_test_ohe, y_test, # 예측 데이터와 예측값의 정답(스케일링만 된 데이터)
+                             cmap=plt.cm.Blues)  # 컬러맵(plt.cm.Reds, plt.cm.rainbow 등이 있음)
+                   
+plt.title(f'Confusion matrix of Logistic Regression, n = {len(y_test)}', fontsize=15, pad=13)
 plt.show();
 ```
+![다운로드](https://user-images.githubusercontent.com/110000734/189639865-f53a8d8b-d351-46ea-aed4-822bd9e8a3e9.png)
 ### 7. ROC, AUC (Receiver Operating Characteristic, Area Under the Curve)
 #### ROC
 - 모델이 예측하는 확률과 예측값 자체를 평가하는 지표\

@@ -148,8 +148,17 @@ plt.show();
     - 임계값이 0인 경우 TPR, FPR = 1   
 [ROC커브 그래프](http://www.navan.name/roc/)    
 
-
-
+##### - proba
+```python
+y_pred_proba = logistic.predict_proba(x_test_ohe)[:,1]  # 예측한 값 중 1인 확률
+# logistic.predict_proba(x_test_ohe) : 테스트데이터에서 예측한 0일 확률, 1일 확률의 배열
+```
+- real과 proba 비교  dataframe
+```python
+pred_proba = pd.DataFrame({'y_test': y_test,            # 실제값, 1을 예측한 확률값 비교 프레임
+                           'pred_proba': y_pred_proba})
+pred_proba.sort_values(by='pred_proba', ascending=True)
+```
 - roc_curve 
 ```python
 from sklearn.metrics import roc_curve
@@ -184,16 +193,9 @@ plt.show();
 - 1에 가까울 수록 좋고, 0.5에 가까울수록 안좋은 모델
 ```python
 from sklearn.metrics import roc_auc_score
-
-y_pred_proba = logistic.predict_proba(x_test_ohe)[:,1] # 0과 1의 값 중 1인 값
 auc = roc_auc_score(y_test, y_pred_proba)              # AUC 분류모델의 성능 결과치
 ```
-- real과 proba 비교  dataframe
-```python
-pred_proba = pd.DataFrame({'y_test': y_test,               # y_val과 1일 확률 예측값 비교
-                           'pred_proba': y_pred_proba})
-pred_proba.sort_values(by='pred_proba', ascending=True)
-```
+
 
 #### 8. LogisticCV
 - 최적의 규제 강도(Cs)를 구하는 방법

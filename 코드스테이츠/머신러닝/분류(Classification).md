@@ -196,7 +196,7 @@ pred_proba.sort_values(by='pred_proba', ascending=True)
 ```
 
 #### 8. LogisticCV
--최적의 규제 강도(Cs)를 구하는 방법
+- 최적의 규제 강도(Cs)를 구하는 방법
 ```python
 from sklearn.linear_model import LogisticRegressionCV
 Cs = np.arange(1,100,1)                          # 규제의 강도를 설정하는 파라미터(릿지,라쏘 알파와 같은 개념)
@@ -204,7 +204,8 @@ logistic_cv = LogisticRegressionCV(Cs=Cs)        # Cs별 로지스틱 모델
 logistic_cv.fit(x_train_ohe, y_train)                 
 
 logistic_cv_val = logistic_cv.predict(x_val_ohe) # 검증데이터 예측값
-print(f"cs:{logistic_cv.C_[0]}, accuracy:{round(test(y_val, logistic_cv_val)[0],2)}") # 모델.C_ = 최적의 Cs값
+print(f"cs:{logistic_cv.C_[0]}, accuracy:{round(test(y_val, logistic_cv_val)[0],2)}") 
+# 모델.C_ = 최적의 Cs값
 ```
 
 #### 임계값(thresholds)

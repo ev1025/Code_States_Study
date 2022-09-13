@@ -93,7 +93,7 @@ y_pred = pipe_dt.predict(x_test)                                   # test데이�
 import matplotlib.pyplot as plt   # 특성중요도 그래프
 
 pipe_dt = pipe_dt.named_steps['decisiontreeclassifier']
-importances = pd.Series(pipe_dt.feature_importances_, x_train.columns)
+importances = pd.Series(pipe_dt.feature_importances_, x_train.columns) # .feature_importances_ 특성중요도 반환
 plt.figure(figsize=(10, 20))
 importances.sort_values().plot.barh();
 ```
@@ -132,7 +132,7 @@ display(graphviz.Source(dot_data))
 ### Out-of Bag samples(oob sample)
 - oob sample은 부트스트랩에서 한 번도 추출되지 않은 샘플을 의미한다.
 - 데이터가 충분히 크다고 가정했을 때,   
-> 한 부트스트랩 세트는 표본의 63.2%에 해당하는 샘플을 가짐
+> 한 부트스트랩 세트는 표본의 63.2%에 해당하는 샘플을 가짐   
 > 여기서 추출되지 않은 36.8%의 샘플이 Out-Of-Bag 샘플이며 이것으로 데이터검증
 ### Aggregation
 - 부트스트랩세트로 만들어진 기본모델들을 합치는 과정
@@ -146,6 +146,7 @@ pipe_random = make_pipeline(
     OrdinalEncoder(),
     SimpleImputer(),
     RandomForestClassifier(random_state=2,
+                           min_sample_split = 2   # 내부노드(internal node)에서의 최소 데이터 수(default = 2)
                            min_samples_leaf = 5,  # min_sample_leaf 분기 최소 샘플수  
                            max_depth=20,          # 밑의 3개는 랜덤 포레스트에서만 사용가능
                            max_features = 30,     # max_features : 분할에 사용되는 최대 특성의 수(최대 특성의 수까지)
@@ -166,8 +167,8 @@ pipe_random.named_steps["randomforestclassifier"].oob_score_
 %matplotlib inline
 import matplotlib.pyplot as plt
 
-model_rf = pipe_random.named_steps['randomforestclassifier']
-importances = pd.Series(model_rf.feature_importances_, x_train.columns)
+model_rf = pipe_random.named_steps['randomforestclassifier']            # 파이프모델.named_steps['파이프 속성'] 속성에 매치된 항목들 반환 ex) enc = 인코딩 된 속성들
+importances = pd.Series(model_rf.feature_importances_, x_train.columns) # .feature_importances_ 특성중요도 반환
 plt.figure(figsize=(10, 20))
 importances.sort_values().plot.barh();
 ```
@@ -175,6 +176,6 @@ importances.sort_values().plot.barh();
 
 
 #### 무엇인가??
-min_sample_split ?
-.named_steps ? 
-.feature_importances_ ?
+
+.named_steps ?    ok   
+.feature_importances_ ?   ok   

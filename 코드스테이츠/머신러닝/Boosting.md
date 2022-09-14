@@ -15,16 +15,23 @@
 - 앞의 모델에서 잘 예측하지 못하는 부분을 집중해서 학습
 - AdaBoost, Gradient Boosting 모델
 - 반복할수록 최종모델의 복잡도가 상승하며 편향을 줄여 과소적합을 해소
-- 앞모델에서의 오류값*learning_rate 를 더하여 누적 값으로 학습 진행 -> learnig_rate가  높으면 과적합이 되기 쉽다.   
+- 앞모델에서의 오류값*learning_rate를 더하여 누적학습 진행 -> learnig_rate가  높으면 과적합이 되기 쉽다.   
+- 러닝레이트 시각자료   
 <http://arogozhnikov.github.io/2016/07/05/gradient_boosting_playground.html>
 - 0값에 가까울수록 오차가 적다(=과적합되었다)   
+![Untitled](https://user-images.githubusercontent.com/110000734/190153132-c1d80297-935b-403a-81e8-671da38a48a2.png)
+
+
 
 ---
 ### AdaBoost
 - 분류문제에 사용되며, 이상치에 민감하고 성능이 떨어짐
 - 첫 모델이 잘못 분류한 관측치를 다음 모델이 샘플링 할 확률을 높임(가중치를  줌)
 - 두번째 모델이 잘못 분류한 관측치를 다음 모델이 샘플링 할 확률을 높힘
-- 최종예측 시 각 기본모델의 가중치르 다르게 주어 예측
+- 최종예측 시 각 기본모델의 가중치르 다르게 주어 예측   
+![AdaBoost](https://user-images.githubusercontent.com/110000734/190152995-63db8b93-b808-4c5d-804c-c0c5a4a1ba53.png)
+
+
 
 
 ### Gradient Boosting

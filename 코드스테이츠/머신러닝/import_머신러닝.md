@@ -11,6 +11,10 @@ Ridge = RidgeCV(alphas=alphas, cv=n, random_state=) # alphas = np.arange(1,100,1
 Lasso = LassoCV(alphas=alphas, cv=n, random_state=)
 
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score   # 회귀평가지표
+
+model.coef_       # 회귀계수(값이 크다고 영향력이 큰 것은 아니다, 단위의 차이일 수 있음) <-> 분류의 feature_importance
+model.intercept_  # y절편
+# y = ax + b      # a = coef_  / b = intercept_
 ```
 ### 분류
 ```python
